@@ -1,41 +1,68 @@
-// Configura a cena
+// criando a cena
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
 
+// criando a câmera
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+// definindo a posição da câmera
+camera.position.z = 10;
+
+// criando o renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Cria a esfera
+// criando a esfera
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-const sphereMaterial = new THREE.MeshPhongMaterial({color: 0xff0000});
+const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-sphere.position.set(0, 0, 0);
 scene.add(sphere);
 
-// Cria a luz
-const light = new THREE.PointLight(0xffffff, 1, 100);
-light.position.set(0, 0, 0);
-sphere.add(light);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Cor da luz, intensidade
+scene.add(ambientLight);
 
-// Adiciona a sombra
-sphere.castShadow = true;
-sphere.receiveShadow = true;
-light.castShadow = true;
+// criando a luz pontual
+const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+pointLight.position.set(1, 1, 1);
 
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-// Renderiza a cena
+// Cria uma SphereGeometry para representar a luz
+const lightSphereGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+const lightSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, emissive: 0xffffff });
+const lightSphereMesh = new THREE.Mesh(lightSphereGeometry, lightSphereMaterial);
+lightSphereMesh.position.copy(pointLight.position);
+
+
+scene.add(pointLight);
+scene.add(lightSphereMesh);
+
+// Variáveis para controlar a rotação da luz
+let angle = 0;
+const radius = 5;
+
+
+
+// animando a cena
 function animate() {
   requestAnimationFrame(animate);
 
+  // girando a esfera
   sphere.rotation.x += 0.01;
   sphere.rotation.y += 0.01;
 
-  light.position.x = 5 * Math.sin(Date.now() * 0.001);
-  light.position.y = 5 * Math.cos(Date.now() * 0.001);
+  // Atualiza a posição da luz
+  const x = Math.cos(angle) * radius;
+  const y = Math.sin(angle) * radius;
+  pointLight.position.set(x, y, y);
+  lightSphereMesh.position.copy(pointLight.position);
+
+  // Rotaciona a luz
+  angle += 0.01;
 
   renderer.render(scene, camera);
 }
