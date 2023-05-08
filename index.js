@@ -1,79 +1,102 @@
-// criando a cena
-const scene = new THREE.Scene();
+const canvas = document.getElementById('canvas');
+const gl = canvas.getContext('webgl2');
 
-// criando a câmera
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+const vertexShaderSource = document.getElementById('vertexShader').text;
+const fragmentShaderSource = document.getElementById('fragmentShader').text;
 
-// definindo a posição da câmera
-camera.position.z = 10;
+const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+gl.shaderSource(vertexShader, vertexShaderSource);
+gl.compileShader(vertexShader);
 
-// criando o renderer
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+gl.shaderSource(fragmentShader, fragmentShaderSource);
+gl.compileShader(fragmentShader);
 
-// criando a esfera
-const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-const sphereGeometry2 = new THREE.SphereGeometry(1, 32, 32);
-const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-const sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial);
-scene.add(sphere);
-scene.add(sphere2);
+const devicePixelRatio = window.devicePixelRatio || 1;
+canvas.width = canvas.clientWidth * devicePixelRatio;
+canvas.height = canvas.clientHeight * devicePixelRatio;
+gl.viewport(0, 0, canvas.width, canvas.height);
 
+const program = gl.createProgram();
+gl.attachShader(program, vertexShader);
+gl.attachShader(program, fragmentShader);
+gl.linkProgram(program);
+gl.useProgram(program);
 
+const positionBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+const positions = [
+    -1.0, -1.0, 0.0,
+    1.0, -1.0, 0.0,
+    -1.0, 1.0, 0.0,
+    1.0, 1.0, 0.0,
+];
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
+const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
+gl.enableVertexAttribArray(positionAttributeLocation);
+gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
-
-// criando a luz pontual
-const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-pointLight.position.set(1, 1, 1);
-
-
-// Cria uma SphereGeometry para representar a luz
-const lightSphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-const lightSphereMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff });
-const lightSphereMesh = new THREE.Mesh(lightSphereGeometry, lightSphereMaterial);
-lightSphereMesh.position.copy(pointLight.position);
-
-
-scene.add(pointLight);
-scene.add(lightSphereMesh);
-
-// Variáveis para controlar a rotação da luz
-let angle = 0;
-const radius = 5;
+const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
+gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
 
 
+//daqui p baixo
 
-// animando a cena
-function animate() {
-  requestAnimationFrame(animate);
 
-  // girando a esfera
-  sphere.rotation.x += 0.01;
-  sphere.rotation.y += 0.01;
+const sphereColor = gl.getUniformLocation(program, 'u_sphereColor');
+const cubeColor = gl.getUniformLocation(program, 'u_cubeColor');
+const obstacleColor = gl.getUniformLocation(program, 'u_obstacleColor');
 
-  // Atualiza a posição da luz
-  const x = Math.cos(angle) * radius;
-  const y = Math.sin(angle) * radius;
-  pointLight.position.set(x, y, y);
-  lightSphereMesh.position.copy(pointLight.position);
+gl.uniform3f(sphereColor, 0.0, 1.0, 0.0); // verde
+gl.uniform3f(cubeColor, 0.0, 0.0, 1.0); // azul
+gl.uniform3f(obstacleColor, 0.0, 1.0, 0.0); // verde
 
-  // Rotaciona a luz
-  angle += 0.01;
-
-  renderer.render(scene, camera);
+function fract(x) {
+    return x - Math.floor(x);
 }
-animate();
+const xObstacle = gl.getUniformLocation(program, 'u_xObstacle')
+
+var jumping = false;
+
+const timeUniformLocation = gl.getUniformLocation(program, 'u_time');
+
+const u_y = gl.getUniformLocation(program, 'u_y');
+gl.uniform1f(u_y, 0.0);
+
+const u_zCam = gl.getUniformLocation(program, 'u_zCam');
+
+var time = 0
+var y = 0.0
+var direction = 'up'
+var zCam = 9.0
 
 
 
+function render() {
+    time += 0.001;
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Cor da luz, intensidade
-scene.add(ambientLight);
+    if(direction == 'up') {
+        y += 0.01
+    }
+    else {
+        y -= 0.01
+    }
+
+    if(y >= 2.5) {
+        direction = 'down'
+    }
+    else if( y <= -2.5) {
+        direction = 'up'
+    }
+
+    gl.uniform1f(u_y, y);
+    gl.uniform1f(u_zCam, zCam);
+    gl.uniform1f(timeUniformLocation, time);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+    requestAnimationFrame(render);
+}
+
+requestAnimationFrame(render);
