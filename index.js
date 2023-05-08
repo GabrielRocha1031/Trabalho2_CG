@@ -48,7 +48,7 @@ const sphereColor = gl.getUniformLocation(program, 'u_sphereColor');
 const cubeColor = gl.getUniformLocation(program, 'u_cubeColor');
 const obstacleColor = gl.getUniformLocation(program, 'u_obstacleColor');
 
-gl.uniform3f(sphereColor, 0.0, 0.0, 1.0); // verde
+gl.uniform3f(sphereColor, 1.0, 1.0, 1.0); // azul
 gl.uniform3f(cubeColor, 0.0, 0.0, 1.0); // azul
 gl.uniform3f(obstacleColor, 0.0, 1.0, 0.0); // verde
 
@@ -67,13 +67,17 @@ gl.uniform1f(u_y, 0.0);
 const u_x = gl.getUniformLocation(program, 'u_x');
 gl.uniform1f(u_x, 0.0);
 
+const u_ygota2 = gl.getUniformLocation(program, 'u_ygota2');
+gl.uniform1f(u_ygota2, 0.0);
+
 const u_zCam = gl.getUniformLocation(program, 'u_zCam');
 
 var time = 0
 var y = 3.0
-
+var ygota2 = -1.0
 var x= 1.0
 var zCam = 5.0
+var ydir = 'up'
 
 
 
@@ -82,6 +86,20 @@ function render() {
 
     y -= 0.02
     x += 0.011666
+    
+    if(ydir=='up'){
+        ygota2 += 0.01
+    }else{
+        ygota2 -= 0.01
+    }
+    
+
+    if(ygota2 >= -1.5){
+        ydir = 'down'
+    }
+    if(ygota2 <= -3.0){
+        ydir = 'up'
+    }
 
     if( x>= 3.5){
         x = 0.0
@@ -93,6 +111,7 @@ function render() {
 
     gl.uniform1f(u_y, y);
     gl.uniform1f(u_x, x);
+    gl.uniform1f(u_ygota2, ygota2);
     gl.uniform1f(u_zCam, zCam);
     gl.uniform1f(timeUniformLocation, time);
 
