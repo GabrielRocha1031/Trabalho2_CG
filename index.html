@@ -12,8 +12,8 @@
         }
 
         canvas {
-            width: 96vh;
-            height: 96vh;
+            width: 48vh;
+            height: 48vh;
             
         }
     </style>
@@ -38,12 +38,13 @@
         uniform vec3 u_cubeColor;
         uniform vec3 u_obstacleColor;
         uniform float u_y;
+        uniform float u_x;
         uniform float u_zCam;
 
         //vec3 lightPosition = vec3(-1.0, 5.0, 10.0);
-        vec3 lightPosition = vec3(2.0, 2.8, 0.0);
+        vec3 lightPosition = vec3(2.0, 0.8, 0.0);
         vec3 lightColor = vec3(1, 0.8509, 0.2392);
-        float lightIntensity = 10.0;
+        float lightIntensity = 15.0;
         float lightAttenuation = 0.2;
 
         vec3 backgroundColor = vec3(0.8509, 0.7451, 0.5059);
@@ -59,7 +60,12 @@
             return length(p - c) - r;
         }
 
-        
+        float torusSDF( vec3 p, vec2 t, float alt)
+        {
+        vec2 q = vec2(length(p.xz)-t.x,p.y+alt);
+        return length(q)-t.y;
+        }
+
 
         float cubeSDF(vec3 p, vec3 pCube, vec3 len) {
             vec3 d = abs(vec3(p.x - pCube.x, p.y - pCube.y, p.z - pCube.z)) - len;
@@ -97,28 +103,50 @@
         }
                 
         vec4 scene(vec3 p) {
-            const int len = 4;
+            const int len = 9;
             float distances[len];
             vec3 colors[len];
 
             //chao
-            distances[0] = cubeSDF(p, vec3(0.0, -3.0, 0.0), vec3(3.0, 0.01, 3.0));
+            distances[0] = cubeSDF(p, vec3(0.0, -2.0, 0.0), vec3(2.0, 0.01, 2.0));
             
-            //cima
-            distances[1] = cubeSDF(p, vec3(0.0, 3.0, 0.0), vec3(3.0, 0.01, 3.0));
-            //fundo
-            distances[2] = cubeSDF(p, vec3(0.0, 0.0, -3.0), vec3(3.0, 3.0, 0.01));
+            //direita
+            distances[1] = cubeSDF(p, vec3(2.0, 0.0, 0.0), vec3(0.01, 2.0, 2.0));
 
-            //lampada
-            distances[3] = sphereSDF(p, vec3(0.0, u_y, 0.0), 0.9);
+            //esquerda
+            distances[2] = cubeSDF(p, vec3(-2.0, 0.0, 0.0), vec3(0.01, 2.0, 2.0));
+
+            //cima
+            distances[3] = cubeSDF(p, vec3(0.0, 2.0, 0.0), vec3(2.0, 0.01, 2.0));
+            //fundo
+            distances[4] = cubeSDF(p, vec3(0.0, 0.0, -2.0), vec3(2.0, 2.0, 0.01));
+
+            //bola y
+            distances[5] = sphereSDF(p, vec3(0.0, u_y, 0.0), 0.3);
+            distances[6] = sphereSDF(p, vec3(0.0, u_y+0.3, 0.0), 0.1);
+
+            //ondas
+            distances[7] = torusSDF(p, vec2(u_x, 0.05), 2.0);
+
+            distances[8] = torusSDF(p, vec2(u_x-1.0, 0.02), 2.2);
+
+
+            
             
 
             //AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 
             colors[0] = u_cubeColor;
             colors[1] = u_cubeColor;
-            colors[2] = u_sphereColor;
-            colors[3] = vec3(1.0);
+            colors[2] = u_cubeColor;
+            colors[3] = u_cubeColor;
+            colors[4] = u_cubeColor;
+            colors[5] = u_sphereColor;
+            colors[6] = u_sphereColor;
+            colors[7] = u_sphereColor;
+            colors[8] = u_sphereColor;
+
+    
 
             float d1 = distances[0];
             vec3 color = colors[0];
@@ -218,7 +246,7 @@
                 
                 t += d;
                 if (d < 0.001 || t > 100.0) {
-                    lightPosition = sphereRotate(lightPosition, 0.5, vec3(0.0));
+                    lightPosition = sphereRotate(lightPosition, 0.1, vec3(0.0));
                     vec3 normal = estimateNormal(p);
                     lightAmount = calculateLight(p, normal);
                     shadow = calculateShadow(p);
@@ -226,7 +254,7 @@
                 }
             }
             
-            //return mix(color,reflection, 0.1) * lightAmount * lightColor * shadow;
+            //return mix(color,reflection, 1.0) * lightAmount * lightColor * shadow;
             return color * lightAmount * lightColor * shadow;
         }
 
