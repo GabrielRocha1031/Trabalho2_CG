@@ -19,12 +19,16 @@ document.body.appendChild(renderer.domElement);
 
 // criando a esfera
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+const sphereGeometry2 = new THREE.SphereGeometry(1, 32, 32);
 const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+const sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial);
 scene.add(sphere);
+scene.add(sphere2);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Cor da luz, intensidade
-scene.add(ambientLight);
+
+
+
 
 // criando a luz pontual
 const pointLight = new THREE.PointLight(0xffffff, 1, 100);
@@ -32,8 +36,8 @@ pointLight.position.set(1, 1, 1);
 
 
 // Cria uma SphereGeometry para representar a luz
-const lightSphereGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-const lightSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, emissive: 0xffffff });
+const lightSphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+const lightSphereMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff });
 const lightSphereMesh = new THREE.Mesh(lightSphereGeometry, lightSphereMaterial);
 lightSphereMesh.position.copy(pointLight.position);
 
@@ -67,3 +71,9 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
+
+
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Cor da luz, intensidade
+scene.add(ambientLight);
