@@ -8,14 +8,13 @@
         body {
             display: flex;
             justify-content: center;
-            background-color: #2a2938;
-            cursor: none;
+            background-color: #0a0a0a;
         }
 
         canvas {
             width: 96vh;
             height: 96vh;
-            border: 2px solid #df9943;
+            
         }
     </style>
 
@@ -111,7 +110,7 @@
             distances[2] = cubeSDF(p, vec3(0.0, 0.0, -3.0), vec3(3.0, 3.0, 0.01));
 
             //lampada
-            distances[3] = sphereSDF(p, vec3(0.0, u_y, 0.0), 0.5);
+            distances[3] = sphereSDF(p, vec3(0.0, u_y, 0.0), 0.9);
             
 
             //AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
