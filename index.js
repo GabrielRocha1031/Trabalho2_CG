@@ -40,24 +40,18 @@ gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
 gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
 
-
-//daqui p baixo
-
-
 const sphereColor = gl.getUniformLocation(program, 'u_sphereColor');
 const cubeColor = gl.getUniformLocation(program, 'u_cubeColor');
 const obstacleColor = gl.getUniformLocation(program, 'u_obstacleColor');
 
 gl.uniform3f(sphereColor, 0.1, 0.1, 0.7); // azul
-gl.uniform3f(cubeColor, 1.0, 1.0, 1.0); // azul
-gl.uniform3f(obstacleColor, 0.1, 0.1, 0.7); // verde
+gl.uniform3f(cubeColor, 1.0, 1.0, 1.0); // branco
+gl.uniform3f(obstacleColor, 0.1, 0.1, 0.7); // azul
 
 function fract(x) {
     return x - Math.floor(x);
 }
 const xObstacle = gl.getUniformLocation(program, 'u_xObstacle')
-
-
 
 const timeUniformLocation = gl.getUniformLocation(program, 'u_time');
 
@@ -79,8 +73,6 @@ var x= 1.0
 var zCam = 5.0
 var ydir = 'up'
 
-
-
 function render() {
     y -= 0.04
     x += 0.04
@@ -91,7 +83,6 @@ function render() {
         ygota2 -= 0.02
     }
     
-
     if(ygota2 >= -1.7){
         ydir = 'down'
     }
@@ -111,8 +102,6 @@ function render() {
     gl.uniform1f(u_x, x);
     gl.uniform1f(u_ygota2, ygota2);
     gl.uniform1f(u_zCam, zCam);
-
-
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     requestAnimationFrame(render);

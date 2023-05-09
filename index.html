@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
-    <title>Ray Marching Example</title>
+    <title>Goteira</title>
     <style>
         body {
             display: flex;
@@ -14,10 +13,8 @@
         canvas {
             width: 96vh;
             height: 96vh;
-            
         }
     </style>
-
 </head>
 
 <body>
@@ -31,7 +28,6 @@
     </script>
     <script type="x-shader/x-fragment" id="fragmentShader">
         precision mediump float;
-        
         uniform vec2 u_resolution;
         uniform vec3 u_sphereColor;
         uniform vec3 u_cubeColor;
@@ -63,7 +59,6 @@
         return length(q)-t.y;
         }
 
-
         float cubeSDF(vec3 p, vec3 pCube, vec3 len) {
             vec3 d = abs(vec3(p.x - pCube.x, p.y - pCube.y, p.z - pCube.z)) - len;
             float insideDistance = min(max(d.x, max(d.y, d.z)), 0.0);
@@ -72,7 +67,6 @@
             return insideDistance + outsideDistance;
         }        
         
-
         float smoothMax(float a, float b, float k) {
             return log(exp(k * a) + exp(k * b)) / k;
         }
@@ -80,8 +74,6 @@
         float smoothMin(float a, float b, float k) {
             return -smoothMax(-a, -b, k);
         }
-
-        
                 
         vec4 scene(vec3 p) {
             const int len = 12;
@@ -91,10 +83,10 @@
             //chao
             distances[0] = cubeSDF(p, vec3(0.0, -2.0, 0.0), vec3(2.0, 0.01, 2.0));
             
-            //direita
+            //dir
             distances[1] = cubeSDF(p, vec3(2.0, 0.0, 0.0), vec3(0.01, 2.0, 2.0));
 
-            //esquerda
+            //esq
             distances[2] = cubeSDF(p, vec3(-2.0, 0.0, 0.0), vec3(0.01, 2.0, 2.0));
 
             //cima
@@ -104,7 +96,7 @@
             //fundo
             distances[5] = cubeSDF(p, vec3(0.0, 0.0, -2.0), vec3(2.0, 2.0, 0.01));
 
-            //bola y
+            //bola
             distances[6] = sphereSDF(p, vec3(0.0, u_y, 0.0), 0.3);
             distances[7] = sphereSDF(p, vec3(0.0, u_y+0.2, 0.0), 0.1);
 
@@ -115,12 +107,6 @@
 
             //respingo
             distances[11] = sphereSDF(p, vec3(0.0, u_ygota2, 0.0), 0.05);
-
-
-            
-            
-
-            //AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 
             colors[0] = u_sphereColor;
             colors[1] = u_cubeColor;
@@ -134,8 +120,6 @@
             colors[9] = u_obstacleColor;
             colors[10] = u_obstacleColor;
             colors[11] = u_obstacleColor;
-
-    
 
             float d1 = distances[0];
             vec3 color = colors[0];
@@ -218,7 +202,6 @@
         
             return lf;
         }
-
 
         vec3 raymarch(vec3 ro, vec3 rd) {
             float t = 0.0;
