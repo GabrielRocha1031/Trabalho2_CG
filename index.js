@@ -48,9 +48,9 @@ const sphereColor = gl.getUniformLocation(program, 'u_sphereColor');
 const cubeColor = gl.getUniformLocation(program, 'u_cubeColor');
 const obstacleColor = gl.getUniformLocation(program, 'u_obstacleColor');
 
-gl.uniform3f(sphereColor, 1.0, 1.0, 1.0); // azul
-gl.uniform3f(cubeColor, 0.0, 0.0, 1.0); // azul
-gl.uniform3f(obstacleColor, 0.0, 1.0, 0.0); // verde
+gl.uniform3f(sphereColor, 0.1, 0.1, 0.7); // azul
+gl.uniform3f(cubeColor, 1.0, 1.0, 1.0); // azul
+gl.uniform3f(obstacleColor, 0.3, 0.3, 1.0); // verde
 
 function fract(x) {
     return x - Math.floor(x);
@@ -76,7 +76,7 @@ var time = 0
 var y = 3.0
 var ygota2 = -1.0
 var x= 1.0
-var zCam = 5.0
+var zCam = 5.2
 var ydir = 'up'
 
 
@@ -85,7 +85,7 @@ function render() {
     time += 0.001;
 
     y -= 0.02
-    x += 0.011666
+    x += 0.0185
     
     if(ydir=='up'){
         ygota2 += 0.01
@@ -101,7 +101,7 @@ function render() {
         ydir = 'up'
     }
 
-    if( x>= 3.5){
+    if( x>= 5.5){
         x = 0.0
     }
     
